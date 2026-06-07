@@ -24,7 +24,7 @@ export default function Createkh() {
         } else{
           axios.post("/api/createkh",{
             ten_khach_hang , email ,so_dien_thoai ,dia_chi
-          }).then(()=>{setState({ten_khach_hang:"",email:"",so_dien_thoai:"", email:""})
+          }).then(()=>{setState({ten_khach_hang:"",email:"",so_dien_thoai:"", dia_chi:""})
           
           }).catch((err) => toast.error(err.response.data));
           toast.success("Thêm khách hàng thành công  !")

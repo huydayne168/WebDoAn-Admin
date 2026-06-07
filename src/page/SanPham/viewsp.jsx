@@ -21,7 +21,7 @@ export default function Viewsp() {
     <hr/>
 
     <div  class="row">
-    <img style={{borderRadius: '10px', marginLeft: '10px'}}  src={sanpham.anh_sanpham}  width='150' height='180' class="img img-responsive" />
+    <img style={{borderRadius: '10px', marginLeft: '10px'}}  src={sanpham.anh_sanpham} alt={sanpham.ten_san_pham || "Sản phẩm"} width='150' height='180' class="img img-responsive" />
     <div class="row-1">
         <div class="col mb-3">
             <label class="form-label">Mã sản phẩm</label>

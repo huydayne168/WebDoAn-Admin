@@ -17,8 +17,6 @@ export default function Editnv() {
 
     const [state, setState] = useState(initiaState);
 
-    const [file, setFile] = useState(null);
-  
     const{ten_nhan_vien ,gioi_tinh ,dia_chi ,ngay_sinh ,sdt ,cmnd ,anh_nhanvien } = state;
   
     const {ma_nhan_vien} = useParams();
@@ -39,7 +37,7 @@ export default function Editnv() {
   
     const handleFileChange = (e) => {
       const file = e.target.files[0];
-      setFile(file);
+      if (!file) return;
       setState({ ...state, anh_nhanvien: `/images/${file.name}` });
     };
     

@@ -39,7 +39,7 @@ export default function TaiKhoan() {
         <div class="card shadow mb-4">
         <div class="d-flex align-items-center justify-content-between card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Dữ Liệu Tài Khoản</h6>
-            <a href="" class="btn btn-primary">Thêm tài khoản</a>
+            <button type="button" class="btn btn-primary">Thêm tài khoản</button>
         </div>
         <div className="d-flex align-items-center  card-header ">
             <form className="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search">
@@ -87,8 +87,8 @@ export default function TaiKhoan() {
                         <tr key={item.id}>
                           <td>{index+1}</td>
                           <td>{item.email}</td>
-                          <td><a href="" type="button" class="btn btn-primary">Chi Tiết</a></td>
-                          <td><a href="" class="btn btn-warning">Sửa</a></td>
+                          <td><button type="button" class="btn btn-primary">Chi Tiết</button></td>
+                          <td><button type="button" class="btn btn-warning">Sửa</button></td>
                           <td>
                                   <button type='submit' onclick="deleteConfirm(event)" class='btn btn-danger'>Xóa</button>
                           </td>

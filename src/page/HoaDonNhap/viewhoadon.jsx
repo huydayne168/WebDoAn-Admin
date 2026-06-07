@@ -42,7 +42,7 @@ export default function Viewhoadonnhap() {
                         {chiTiet.map((item)=>{
                             return(
                             <tr key={item.ma_chi_tiet_don_hang}>
-                                <td><img style={{borderRadius: '5px'}} src={item.anh_san_pham} width='60' height='60' className="img img-responsive" /></td>
+                                <td><img style={{borderRadius: '5px'}} src={item.anh_san_pham} alt={item.ten_san_pham || "Sản phẩm"} width='60' height='60' className="img img-responsive" /></td>
                                 <td>{item.ten_san_pham}</td>
                                 <td>{item.kich_co}</td>
                                 <td>{item.mau_sac}</td>

@@ -109,7 +109,7 @@ export default function Indexnv() {
                                 <tr key={item.ma_nhan_vien}>
                                 <td>{index+1}</td>
                                 <td>{item.ma_nhan_vien}</td>
-                                <td><img style={{borderRadius:'5px'}} src={item.anh_nhanvien} width='60' height='60' className="img img-responsive" /></td>
+                                <td><img style={{borderRadius:'5px'}} src={item.anh_nhanvien} alt={item.ten_nhan_vien || "Nhân viên"} width='60' height='60' className="img img-responsive" /></td>
                                 <td>{item.ten_nhan_vien}</td>
                                 <td>{item.sdt}</td>
                                 <td><Link to={`/Viewnv/${item.ma_nhan_vien}`} type="button" className="btn btn-primary">Chi Tiết</Link></td>

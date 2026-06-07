@@ -113,7 +113,7 @@ export default function Indexsp() {
                             return(  
                             <tr key={item.ma_san_pham}>
                                 <td>{index+1}</td>
-                                <td><img style={{borderRadius: '5px'}} src={item.anh_sanpham} width='60' height='60' className="img img-responsive" /></td>
+                                <td><img style={{borderRadius: '5px'}} src={item.anh_sanpham} alt={item.ten_san_pham || "Sản phẩm"} width='60' height='60' className="img img-responsive" /></td>
                                 <td>{item.ten_san_pham}</td>
                                 <td>{item.soluong}</td>
                                 <td><Link to={`/Viewsp/${item.ma_san_pham}`} type="button" className="btn btn-primary">Chi Tiết</Link></td>
