@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import { isBlank, isNonNegativeInteger, isValidImageFile, isValidUrlOrPath } from "../../utils/validation";
 
 const initialState = {
   title: "",
@@ -42,6 +43,11 @@ export default function Editbanner() {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0] || null;
+    if (selectedFile && !isValidImageFile(selectedFile)) {
+      toast.error("Ảnh banner phải là JPG, PNG hoặc WEBP và nhỏ hơn 5MB.");
+      e.target.value = "";
+      return;
+    }
     setFile(selectedFile);
     setPreview(selectedFile ? URL.createObjectURL(selectedFile) : "");
   };
@@ -49,13 +55,40 @@ export default function Editbanner() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!file && !state.image_url) {
+    if (!file && isBlank(state.image_url)) {
       toast.error("Vui lòng chọn ảnh banner hoặc nhập URL ảnh.");
       return;
     }
 
+    if (!isBlank(state.title) && state.title.trim().length < 2) {
+      toast.error("Tiêu đề banner phải có ít nhất 2 ký tự.");
+      return;
+    }
+
+    if (!isNonNegativeInteger(state.sort_order)) {
+      toast.error("Thứ tự hiển thị phải là số nguyên không âm.");
+      return;
+    }
+
+    if (!isValidUrlOrPath(state.link_url)) {
+      toast.error("Link banner phải là URL hợp lệ hoặc đường dẫn nội bộ bắt đầu bằng /.");
+      return;
+    }
+
+    if (!isBlank(state.image_url) && !isValidUrlOrPath(state.image_url)) {
+      toast.error("URL ảnh banner không hợp lệ.");
+      return;
+    }
+
     const formData = new FormData();
-    Object.entries(state).forEach(([key, value]) => formData.append(key, value));
+    Object.entries({
+      ...state,
+      title: state.title.trim(),
+      subtitle: state.subtitle.trim(),
+      image_url: state.image_url.trim(),
+      link_url: state.link_url.trim(),
+      sort_order: Number(state.sort_order),
+    }).forEach(([key, value]) => formData.append(key, value));
     if (file) formData.append("image", file);
 
     axios

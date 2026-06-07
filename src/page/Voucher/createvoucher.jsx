@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { isBlank, isNonNegativeNumber, isPositiveInteger, isPositiveNumber } from "../../utils/validation";
 
 const initialState = {
   coupon_name: "",
@@ -35,18 +36,52 @@ export default function Createvoucher() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!coupon_name || !discount_type || !discount_amount || !remaining_count || !value || !expiry_date) {
+    if (isBlank(coupon_name) || isBlank(discount_type) || isBlank(discount_amount) || isBlank(remaining_count) || isBlank(value) || isBlank(expiry_date)) {
       toast.error("Vui lòng nhập đầy đủ thông tin bắt buộc");
       return;
     }
 
+    if (/\s/.test(coupon_name.trim())) {
+      toast.error("Mã voucher không được chứa khoảng trắng");
+      return;
+    }
+
+    if (discount_type === "percent" && (!isPositiveNumber(discount_amount) || Number(discount_amount) > 100)) {
+      toast.error("Voucher giảm phần trăm phải có giá trị từ 1 đến 100");
+      return;
+    }
+
+    if (discount_type === "amount" && !isPositiveNumber(discount_amount)) {
+      toast.error("Mức giảm tiền phải lớn hơn 0");
+      return;
+    }
+
+    if (!isPositiveInteger(remaining_count)) {
+      toast.error("Số lượng voucher phải là số nguyên lớn hơn 0");
+      return;
+    }
+
+    if (!isNonNegativeNumber(value)) {
+      toast.error("Giá trị áp dụng phải là số không âm");
+      return;
+    }
+
+    const today = new Date();
+    const expiry = new Date(expiry_date);
+    today.setHours(0, 0, 0, 0);
+    expiry.setHours(0, 0, 0, 0);
+    if (expiry < today) {
+      toast.error("Ngày hết hạn không được nhỏ hơn hôm nay");
+      return;
+    }
+
     axios.post("/api/createvoucher", {
-      coupon_name,
+      coupon_name: coupon_name.trim().toUpperCase(),
       discount_type,
-      discount_amount,
-      remaining_count,
-      description,
-      value,
+      discount_amount: Number(discount_amount),
+      remaining_count: Number(remaining_count),
+      description: description.trim(),
+      value: Number(value),
       expiry_date,
     })
       .then(() => {

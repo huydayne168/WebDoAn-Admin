@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { isBlank } from '../../utils/validation';
 const initiaState = {
   ten_danh_muc :"",
 };
@@ -30,13 +31,15 @@ const handleInputChange = (e) =>{
 const handleSubmit = (e) => {
   e.preventDefault();
 
-  if(!ten_danh_muc){
+  if(isBlank(ten_danh_muc)){
     toast.error("Vui lòng nhập đầy đủ thông tin");
+  } else if (ten_danh_muc.trim().length < 2) {
+    toast.error("Tên danh mục phải có ít nhất 2 ký tự");
 
   } else{
     if(window.confirm("Bạn có muốn cập nhật thông tin  ?")){
       axios.put(`/api/updatedm/${ma_danh_muc}`,{
-        ten_danh_muc
+        ten_danh_muc: ten_danh_muc.trim()
       }).then(()=>{
         setState({ten_danh_muc :""})
       }).catch((err) => toast.error(err.response.data));

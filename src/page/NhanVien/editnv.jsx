@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { isBlank, isFutureDate, isValidCitizenId, isValidImageFile, isValidVietnamPhone } from '../../utils/validation';
 
 const initiaState = {
     ten_nhan_vien:"",
@@ -38,17 +39,41 @@ export default function Editnv() {
     const handleFileChange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
+      if (!isValidImageFile(file)) {
+        toast.error("Ảnh phải là JPG, PNG hoặc WEBP và nhỏ hơn 5MB");
+        e.target.value = "";
+        return;
+      }
       setState({ ...state, anh_nhanvien: `/images/${file.name}` });
     };
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(!ten_nhan_vien || !gioi_tinh || !dia_chi || !ngay_sinh  || !sdt || !cmnd || !anh_nhanvien){
+        const gender = gioi_tinh.trim().toLowerCase();
+        if(isBlank(ten_nhan_vien) || isBlank(gioi_tinh) || isBlank(dia_chi) || isBlank(ngay_sinh)  || isBlank(sdt) || isBlank(cmnd) || isBlank(anh_nhanvien)){
             toast.error("Vui lòng nhập đủ thông tin ")
+        } else if (ten_nhan_vien.trim().length < 2) {
+            toast.error("Tên nhân viên phải có ít nhất 2 ký tự")
+        } else if (!["nam", "nữ", "nu", "khác", "khac"].includes(gender)) {
+            toast.error("Giới tính chỉ được nhập Nam, Nữ hoặc Khác")
+        } else if (isFutureDate(ngay_sinh)) {
+            toast.error("Ngày sinh không được lớn hơn ngày hiện tại")
+        } else if (dia_chi.trim().length < 5) {
+            toast.error("Địa chỉ phải có ít nhất 5 ký tự")
+        } else if (!isValidVietnamPhone(sdt)) {
+            toast.error("Số điện thoại phải gồm 10 số và bắt đầu bằng 03, 05, 07, 08 hoặc 09")
+        } else if (!isValidCitizenId(cmnd)) {
+            toast.error("CCCD/CMND phải gồm 9 hoặc 12 chữ số")
         } else{
             if(window.confirm("Bạn có muốn cập nhật thông tin  ?")){
                 axios.put(`/api/updatenv/${ma_nhan_vien}`,{
-                    ten_nhan_vien,gioi_tinh,dia_chi,ngay_sinh,sdt,cmnd,anh_nhanvien
+                    ten_nhan_vien: ten_nhan_vien.trim(),
+                    gioi_tinh: gioi_tinh.trim(),
+                    dia_chi: dia_chi.trim(),
+                    ngay_sinh,
+                    sdt: sdt.trim(),
+                    cmnd: cmnd.trim(),
+                    anh_nhanvien
                 }).then(()=> {setState({ ten_nhan_vien:"",gioi_tinh:"",ngay_sinh:"", dia_chi:"",sdt:"",cmnd:"",anh_nhanvien:""})})
                 .catch((err) => toast.error(err.response.data));
                 toast.success("Sửa nhân viên thành công !")

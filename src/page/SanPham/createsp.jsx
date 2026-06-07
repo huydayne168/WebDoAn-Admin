@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { isBlank, isNonNegativeInteger, isPositiveNumber, isValidImageFile } from "../../utils/validation";
 
 const initiaState = {
     ten_san_pham: "",
@@ -58,20 +59,25 @@ export default function Createsp() {
 
         // Kiểm tra thiếu trường nào thì báo lỗi
         if (
-            !ten_san_pham ||
-            !gia ||
-            !gia_goc ||
-            !mau_sac ||
+            isBlank(ten_san_pham) ||
+            isBlank(gia) ||
+            isBlank(gia_goc) ||
+            isBlank(mau_sac) ||
             (!files.anh_sanpham && !state.anh_sanpham) ||
-            !ma_danh_muc ||
-            !soluong ||
-            !mo_ta
+            isBlank(ma_danh_muc) ||
+            isBlank(soluong) ||
+            isBlank(mo_ta)
         ) {
             toast.error("Vui lòng nhập đầy đủ tất cả thông tin sản phẩm.");
             return;
         }
 
-        if (Number.isNaN(salePrice) || Number.isNaN(originalPrice)) {
+        if (ten_san_pham.trim().length < 2) {
+            toast.error("Tên sản phẩm phải có ít nhất 2 ký tự.");
+            return;
+        }
+
+        if (!isPositiveNumber(gia) || !isPositiveNumber(gia_goc)) {
             toast.error("Giá bán và giá gốc phải là số hợp lệ.");
             return;
         }
@@ -81,9 +87,19 @@ export default function Createsp() {
             return;
         }
 
+        if (!isNonNegativeInteger(soluong)) {
+            toast.error("Số lượng phải là số nguyên không âm.");
+            return;
+        }
+
+        if (mo_ta.trim().length < 5) {
+            toast.error("Mô tả phải có ít nhất 5 ký tự.");
+            return;
+        }
+
         try {
             const formData = new FormData();
-            formData.append("so_luong", state.soluong);
+            formData.append("so_luong", Number(state.soluong));
             // append text fields
             Object.keys(state).forEach((key) => {
                 if (key === "soluong") return;
@@ -120,6 +136,11 @@ export default function Createsp() {
         const file = e.target.files[0];
         const name = e.target.name;
         if (file) {
+            if (!isValidImageFile(file)) {
+                toast.error("Ảnh phải là JPG, PNG hoặc WEBP và nhỏ hơn 5MB.");
+                e.target.value = "";
+                return;
+            }
             setFiles((prev) => ({ ...prev, [name]: file }));
             setPreviews((prev) => ({
                 ...prev,

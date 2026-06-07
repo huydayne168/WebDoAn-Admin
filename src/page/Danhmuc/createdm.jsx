@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import {toast} from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { isBlank } from '../../utils/validation';
 
 const initiaState = {
   ten_danh_muc :"",
@@ -17,12 +18,14 @@ export default function Createdm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if(!ten_danh_muc){
+    if(isBlank(ten_danh_muc)){
       toast.error("Vui lòng nhập đầy đủ thông tin");
+    } else if (ten_danh_muc.trim().length < 2) {
+      toast.error("Tên danh mục phải có ít nhất 2 ký tự");
 
     } else{
       axios.post("/api/createdm",{
-        ten_danh_muc
+        ten_danh_muc: ten_danh_muc.trim()
       }).then(()=>{setState({ten_danh_muc :""})
       
       }).catch((err) => toast.error(err.response.data));

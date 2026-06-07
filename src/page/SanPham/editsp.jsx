@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { isBlank, isNonNegativeInteger, isPositiveNumber, isValidImageFile } from "../../utils/validation";
 
 const initiaState = {
     ten_san_pham: "",
@@ -68,6 +69,11 @@ export default function Editsp() {
     const handleFileChange = (e, type) => {
         const file = e.target.files[0];
         if (!file) return;
+        if (!isValidImageFile(file)) {
+            toast.error("Ảnh phải là JPG, PNG hoặc WEBP và nhỏ hơn 5MB.");
+            e.target.value = "";
+            return;
+        }
         setFiles((prev) => ({ ...prev, [type]: file }));
         const objectUrl = URL.createObjectURL(file);
         setPreviews((prev) => ({ ...prev, [type]: objectUrl }));
@@ -82,21 +88,33 @@ export default function Editsp() {
 
         // Kiểm tra bắt buộc các trường quan trọng
         if (
-            !state.ten_san_pham ||
-            !state.gia ||
-            !state.gia_goc ||
+            isBlank(state.ten_san_pham) ||
+            isBlank(state.gia) ||
+            isBlank(state.gia_goc) ||
             (!files.anh_sanpham && !state.anh_sanpham) ||
-            !state.ma_danh_muc
+            isBlank(state.ma_danh_muc)
         ) {
             return toast.error("Vui lòng nhập đầy đủ thông tin");
         }
 
-        if (Number.isNaN(salePrice) || Number.isNaN(originalPrice)) {
+        if (state.ten_san_pham.trim().length < 2) {
+            return toast.error("Tên sản phẩm phải có ít nhất 2 ký tự.");
+        }
+
+        if (!isPositiveNumber(state.gia) || !isPositiveNumber(state.gia_goc)) {
             return toast.error("Giá bán và giá gốc phải là số hợp lệ.");
         }
 
         if (originalPrice <= salePrice) {
             return toast.error("Giá gốc phải lớn hơn giá bán.");
+        }
+
+        if (!isBlank(state.so_luong) && !isNonNegativeInteger(state.so_luong)) {
+            return toast.error("Số lượng phải là số nguyên không âm.");
+        }
+
+        if (!isBlank(state.mo_ta) && state.mo_ta.trim().length < 5) {
+            return toast.error("Mô tả phải có ít nhất 5 ký tự.");
         }
 
         if (!window.confirm("Bạn có muốn cập nhật thông tin?")) return;

@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { isBlank, isFutureDate, isPositiveInteger } from '../../utils/validation';
 
 const initialState = {
   ten_san_pham: "",
@@ -21,12 +22,18 @@ export default function Createkhohang() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!ten_san_pham || !so_luong || !ngay_mua) {
+    if (isBlank(ten_san_pham) || isBlank(so_luong) || isBlank(ngay_mua)) {
       toast.error("Vui lòng nhập đủ thông tin!");
+    } else if (ten_san_pham.trim().length < 2) {
+      toast.error("Tên sản phẩm phải có ít nhất 2 ký tự");
+    } else if (!isPositiveInteger(so_luong)) {
+      toast.error("Số lượng phải là số nguyên lớn hơn 0");
+    } else if (isFutureDate(ngay_mua)) {
+      toast.error("Ngày mua không được lớn hơn ngày hiện tại");
     } else {
       axios.post("/api/createkhohang", {
-        ten_san_pham,
-        so_luong,
+        ten_san_pham: ten_san_pham.trim(),
+        so_luong: Number(so_luong),
         ngay_mua,
       })
       .then(() => {
